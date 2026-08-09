@@ -30,5 +30,12 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Compilar y ejecutar pruebas JUnit
-        run: mvn --batch-mode clean test
+      - name: Compilar, ejecutar pruebas y generar reporte
+        run: mvn --batch-mode clean test surefire-report:report-only
+
+      - name: Publicar reporte HTML de pruebas
+        uses: actions/upload-artifact@v7
+        with:
+          name: reporte-pruebas-junit
+          path: target/reports/surefire.html
+          if-no-files-found: error
