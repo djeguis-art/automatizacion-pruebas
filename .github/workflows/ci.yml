@@ -30,12 +30,19 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Compilar, ejecutar pruebas y generar reporte
+      - name: Ejecutar pruebas JUnit y BDD
         run: mvn --batch-mode clean test surefire-report:report-only
 
-      - name: Publicar reporte HTML de pruebas
+      - name: Publicar reporte JUnit
         uses: actions/upload-artifact@v7
         with:
           name: reporte-pruebas-junit
           path: target/reports/surefire.html
+          if-no-files-found: error
+
+      - name: Publicar reporte BDD Cucumber
+        uses: actions/upload-artifact@v7
+        with:
+          name: reporte-bdd-cucumber
+          path: target/cucumber-report.html
           if-no-files-found: error
