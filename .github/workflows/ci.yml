@@ -46,3 +46,17 @@ jobs:
           name: reporte-bdd-cucumber
           path: target/cucumber-report.html
           if-no-files-found: error
+
+      - name: Configurar k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Ejecutar prueba de performance con k6
+        run: k6 run --summary-export=target/k6-summary.json performance/login-performance.js
+
+      - name: Publicar resultados de performance
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reporte-performance-k6
+          path: target/k6-summary.json
+          if-no-files-found: warn
