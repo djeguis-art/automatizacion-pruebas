@@ -77,14 +77,14 @@ jobs:
 
               metrics = data.get("metrics", {})
 
-              reqs = metrics.get("http_reqs", {}).get("values", {})
-              duration = metrics.get("http_req_duration", {}).get("values", {})
-              failed = metrics.get("http_req_failed", {}).get("values", {})
+              reqs = metrics.get("http_reqs", {})
+	      duration = metrics.get("http_req_duration", {})
+              failed = metrics.get("http_req_failed", {})
 
               tps = reqs.get("rate", 0)
               promedio = duration.get("avg", 0)
               p95 = duration.get("p(95)", 0)
-              errores = failed.get("rate", 0) * 100
+              errores = failed.get("value", 0) * 100
           else:
               tps = promedio = p95 = errores = 0
 
