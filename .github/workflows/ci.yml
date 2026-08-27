@@ -76,7 +76,7 @@ jobs:
                   data = json.load(f)
 
               metrics = data.get("metrics", {})
-	      reqs = metrics.get("http_reqs", {})
+          reqs = metrics.get("http_reqs", {})
               duration = metrics.get("http_req_duration", {})
               failed = metrics.get("http_req_failed", {})
 
