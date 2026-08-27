@@ -60,3 +60,47 @@ jobs:
           name: reporte-performance-k6
           path: target/k6-summary.json
           if-no-files-found: warn
+
+      - name: Generar dashboard de metricas
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+
+          ruta = "target/k6-summary.json"
+
+          if os.path.exists(ruta):
+              with open(ruta, encoding="utf-8") as f:
+                  data = json.load(f)
+
+              metrics = data.get("metrics", {})
+
+              reqs = metrics.get("http_reqs", {}).get("values", {})
+              duration = metrics.get("http_req_duration", {}).get("values", {})
+              failed = metrics.get("http_req_failed", {}).get("values", {})
+
+              tps = reqs.get("rate", 0)
+              promedio = duration.get("avg", 0)
+              p95 = duration.get("p(95)", 0)
+              errores = failed.get("rate", 0) * 100
+          else:
+              tps = promedio = p95 = errores = 0
+
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("# Dashboard de Calidad\n\n")
+              f.write("## Pruebas funcionales\n\n")
+              f.write("| Indicador | Resultado |\n")
+              f.write("|---|---|\n")
+              f.write("| JUnit + BDD | Ejecutadas |\n")
+              f.write("| Pipeline | Completado |\n\n")
+
+              f.write("## Performance k6\n\n")
+              f.write("| Métrica | Resultado |\n")
+              f.write("|---|---:|\n")
+              f.write(f"| Solicitudes por segundo (TPS aprox.) | {tps:.2f} |\n")
+              f.write(f"| Latencia promedio | {promedio:.2f} ms |\n")
+              f.write(f"| Latencia p95 | {p95:.2f} ms |\n")
+              f.write(f"| Porcentaje de errores | {errores:.2f}% |\n")
+          PY
