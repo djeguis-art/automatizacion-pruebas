@@ -14,6 +14,8 @@ Como funcionalidad de ejemplo se implementó un servicio básico de autenticaci�
 - Java 21
 - Maven 3.9.16
 - JUnit 5
+- Cucumber
+- k6
 - Git y GitHub
 - GitHub Actions
 - Maven Surefire
@@ -26,14 +28,28 @@ automatizacion-pruebas/
 ├── .github/workflows/
 │   └── ci.yml
 │
+├── performance/
+│   └── login-performance.js
+│
+├── scripts/
+│   └── generar_dashboard.py
+│
 ├── src/main/java/
 │   └── cl/automatizacion/service/
 │       └── LoginService.java
 │
 ├── src/test/java/
-│   └── cl/automatizacion/service/
-│       ├── LoginExitosoTest.java
-│       └── LoginCredencialesInvalidasTest.java
+│   └── cl/automatizacion/
+│       ├── runner/
+│       │   └── RunCucumberTest.java
+│       ├── service/
+│       │   ├── LoginExitosoTest.java
+│       │   └── LoginCredencialesInvalidasTest.java
+│       └── steps/
+│           └── LoginSteps.java
+│
+├── src/test/resources/features/
+│   └── login.feature
 │
 ├── .gitignore
 ├── pom.xml
@@ -141,3 +157,61 @@ Esto permite consultar los resultados directamente desde el pipeline.
 Con este proyecto se implementó un flujo básico de automatización de pruebas utilizando Java, Maven, JUnit y GitHub Actions.
 
 Las pruebas pueden ejecutarse localmente y también de forma automática mediante Integración Continua, permitiendo detectar errores antes de incorporar nuevos cambios al proyecto.
+
+## Actividad 2 - BDD y Performance
+
+### Pruebas BDD
+
+Se incorporaron pruebas BDD utilizando Cucumber y lenguaje Gherkin para validar la funcionalidad de inicio de sesión.
+
+Los escenarios se encuentran en:
+
+src/test/resources/features/login.feature
+
+Los Step Definitions se encuentran en:
+
+src/test/java/cl/automatizacion/steps/LoginSteps.java
+
+
+### Reporte Cucumber
+
+Las pruebas BDD generan un reporte HTML en:
+
+target/cucumber-report.html
+
+El reporte también queda disponible como Artifact en GitHub Actions.
+
+
+### Pruebas de Performance
+
+Se utilizó k6 para realizar una prueba básica de rendimiento sobre la funcionalidad de autenticación.
+
+El script se encuentra en:
+
+performance/login-performance.js
+
+Se revisan principalmente las siguientes métricas:
+
+- solicitudes por segundo
+- latencia promedio
+- latencia p95
+- porcentaje de errores
+
+
+### Dashboard y Alertas
+
+GitHub Actions genera un dashboard con los resultados de las pruebas funcionales y de performance.
+
+La prueba de k6 también utiliza thresholds para detectar posibles degradaciones:
+
+- errores inferiores al 1 %
+- latencia p95 inferior a 1000 ms
+
+Si alguno de estos límites se supera, la prueba se marca como fallida.
+
+
+### Integración Continua
+
+El pipeline ejecuta automáticamente las pruebas JUnit, BDD y performance.
+
+Los reportes generados quedan disponibles como Artifacts en GitHub Actions.
